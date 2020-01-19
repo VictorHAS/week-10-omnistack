@@ -8,12 +8,16 @@ import {
   TextInput,
   TouchableOpacity
 } from "react-native";
+
 import {
   requestPermissionsAsync,
   getCurrentPositionAsync
 } from "expo-location";
+
 import { MaterialIcons } from "@expo/vector-icons";
+
 import api from "../services/api";
+import { connect, disconnect, subscribeToNewDevs } from "../services/socket";
 
 import { NavigationStackProp } from "react-navigation-stack";
 
@@ -49,6 +53,18 @@ export default function Main({ navigation }: Props) {
     loadInitialPosition();
   }, []);
 
+  useEffect(() => {
+    subscribeToNewDevs(dev => setDevs([...devs, dev]));
+  }, [devs]);
+
+  function setupWebsocket() {
+    disconnect();
+
+    const { latitude, longitude } = currentRegion;
+
+    connect(latitude, longitude, techs);
+  }
+
   async function loadDevs() {
     const { latitude, longitude } = currentRegion;
     const { data } = await api.get("search", {
@@ -59,6 +75,7 @@ export default function Main({ navigation }: Props) {
       }
     });
     setDevs(data);
+    setupWebsocket();
   }
 
   function handleRegionChanged(region) {

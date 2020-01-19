@@ -105,7 +105,7 @@ module.exports = {
         useUnifiedTopology: true,
         useFindAndModify: false
       },
-      debug: true
+      debug: false
     }
   }
 }

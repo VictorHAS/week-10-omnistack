@@ -3,6 +3,8 @@
 const axios = require('axios')
 const Dev = use('App/Models/Dev')
 
+const { findConnections, sendMessage } = require('../../../start/socket')
+
 class DevController {
   async index() {
     const devs = await Dev.find()
@@ -37,6 +39,15 @@ class DevController {
         techs: techsArray,
         location
       })
+      const sendSocketMessageTo = findConnections(
+        {
+          latitude,
+          longitude
+        },
+        techsArray
+      )
+
+      sendMessage(sendSocketMessageTo, 'new-dev', dev)
     }
 
     return dev
